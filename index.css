@@ -1,0 +1,48 @@
+* {
+	font-family: serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: sans-serif;
+}
+
+code {
+	font-family: monospace;
+}
+/* This facilitates code highlighting (perhaps a la source-highlight(1)) by
+   retaining monospace fonts within bolds, italics, and spans. */
+span, b, strong, i, em {
+	font-family: inherit;
+}
+
+span[lang|="fr"], span[lang|="la"] {
+	font-style: italic;
+}
+
+body {
+	margin: 0 auto;
+	max-width: 75ch;
+	padding: 0 3em;
+}
+
+/* Index page rules. */
+
+ul#index {
+	list-style: none;
+}
+ul#index > li + li {
+	margin-top: 1em;
+}
+
+footer #copyright {
+	text-align: center;
+}
+
+/* Blog post rules. */
+
+p#timestamp {
+	text-align: right;
+}
+p#timestamp time::before {
+	content: "—"
+}

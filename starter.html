@@ -1,0 +1,14 @@
+<html lang="en">
+
+<h1>${title}</h1>
+
+<p><!-- TODO -->
+
+<p id="timestamp">
+<time datetime="${date_iso8601}">${date_pretty}</time>
+
+title="TODO"
+description="TODO"
+keywords="TODO"
+date_iso8601=$(date -d @$_unix_time +%Y-%m-%dT%H:%M:%S%z)
+date_pretty=$(date -d @$_unix_time +'%-d %B, %Y')
