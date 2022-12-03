@@ -15,8 +15,8 @@
 
 readonly UNIX_TIME=$(date +%s)
 readonly RFC822_DATEFORMAT="%a, %d %b %Y %H:%M:%S %Z"
-# A pcrepattern(3) specifying generally how a variable assignment should look.
-readonly VAR_PATTERN="[a-zA-Z_][a-zA-Z0-9_]*=(\\$\\(.*\\)|\".*\"|'.*'|\\S*)"
+
+. ./funcs.sh
 
 if [ -z "$TITLE" -o -z "$URI" -o -z "$DESCRIPTION" ]; then
 	printf >&2 "TITLE, URI, and DESCRIPTION must all be set\n"
@@ -39,15 +39,8 @@ items=$(for file; do
 	fi
 
 	tac "$file" | {
-		# The stdbuf(1) invocation is necessary here; otherwise sed(1)
-		# will consume all of the input.
-		while read -r x; do
-			if [ -z "$x" ]; then continue; fi
-			eval export $x
-		done <<-END
-		$(stdbuf -i0 sed -rn -e "/^$VAR_PATTERN$/!{x;q}" \
-		                     -e "/^(title|description|_unix_time)=/p")
-		END
+		setvars title description _unix_time >/dev/null \
+		     || exit 1
 
 		_unix_time=${_unix_time:-$UNIX_TIME}
 

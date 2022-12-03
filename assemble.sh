@@ -25,8 +25,8 @@
 # second argument.
 
 readonly UNIX_TIME=$(date +%s)
-# A pcrepattern(3) specifying generally how a variable assignment should look.
-readonly VAR_PATTERN="[a-zA-Z_][a-zA-Z0-9_]*=(\\$\\(.*\\)|\".*\"|'.*'|\\S*)"
+
+. ./funcs.sh
 
 # If tac(1) is unavailable, use a sed(1) alternative (likely less efficient).
 if ! command -v tac >/dev/null; then
@@ -37,16 +37,26 @@ if [ ! \( -z "$1" -o "$1" = - \) ]; then
 	exec <"$1"
 fi
 
+# Redirect standard input to an extra file descriptor so it can be read in
+# tandem with standard input by subshells.
 { printf %s\\n "_unix_time=$UNIX_TIME"; tac; } | {
-	# The stdbuf(1) invocation is necessary here; otherwise sed(1) will
-	# consume all of the input.
-	while read -r x; do
-		vars="${vars:+$vars:}\$${x%%=*}"
-		eval export $x </dev/null
-	done <<-END
-	$(stdbuf -i0 sed -rn "/^$VAR_PATTERN$/!{x;q}; p")
-	END
+	# While I would _love_ to be able to do
+	#
+	# setvars -x <&3 | {
+	# 	vars=$(printf \$%s\  $(cat) | tr \  :)
+	# 	tac <&3 | cat ${2:+"$2"} - ${3:+"$3"} | envsubst "$vars"
+	# }
+	#
+	# the subshell is created immediately and therefore the values exported
+	# by setvars are not propogated to where they can be used by
+	# envsubst(1). Therefore a temporary file needs to be created on disk
+	# instead.
 
-	# Here, tac(1) is used again to return input to the correct order.
-	tac | cat ${2:+"$2"} - ${3:+"$3"} | envsubst "$vars"
-}
+	tmp=$(mktemp --tmpdir blog_XXXXXX)
+	trap "rm -f \"$tmp\"" EXIT
+
+	setvars -x >"$tmp" <&3 || exit 1
+	vars=$(printf \$%s\  $(cat "$tmp") | tr \  :)
+
+	tac <&3 | cat ${2:+"$2"} - ${3:+"$3"} | envsubst "$vars"
+} 3<&0
