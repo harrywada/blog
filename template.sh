@@ -5,7 +5,7 @@ readonly VAR_PATTERN=[a-zA-Z_][a-zA-Z0-9_]\*
 readonly DECL_PATTERN="$VAR_PATTERN=(\\$\\(.*\\)|\".*\"|'.*'|\\S*)"
 
 # These variables are provided for convenience in writing templates.
-export readonly ARTICLES=$(find articles/ -type f)
+export readonly ARTICLES=$(find articles/ -type f -name *.html)
 
 # Template the first path argument (or standard input if empty or "-") by
 # running setvars (defined below) on the tail end of it, and then using
