@@ -41,9 +41,11 @@ setvars() {
 		# This is pretty ugly, but is necessary to keep dependent
 		# variables working correctly. Since variable expansions are
 		# temporarily stored in ..._val local variables, these need to
-		# be searched and replaced in advance.
+		# be searched and replaced in advance. Only use existing
+		# variables to not interfere with things like for-loops.
+		local join=$(printf %s\  $vars | tr \  \|)
 		rhs=$(printf %s "$rhs" \
-		    | sed -r "s/(^|[^\\\\\\])(\\\$$VAR_PATTERN)/\\1\\2_val/g")
+		    | sed -r "s/(^|[^\\\\\\])(\\\$(${join%|}))/\\1\\2_val/g")
 
 		eval val=$rhs </dev/null
 		if [ $? -ne 0 ]; then
