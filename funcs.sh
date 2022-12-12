@@ -4,20 +4,29 @@ readonly DECL_PATTERN="$VAR_PATTERN=(\\$\\(.*\\)|\".*\"|'.*'|\\S*)"
 
 # Read and execute variable declarations from standard input. If any shell
 # operations fail, none of the variables are set and an all errors are
-# reported. The -x flag may be supplied to additionally export the variables.
+# reported.
 #
-# Any arguments provided (other than the -x flag) are regarded as
-# an exclusive list of variables which should be recognized. As such,
-# extraneous declarations will not be executed and any potential errors
-# that would result from them are not reported.
+# Any arguments provided (other than the -x and -v flags) are regarded as an
+# exclusive list of variables which should be recognized. As such, extraneous
+# declarations will not be executed and any potential errors that would result
+# from them are not reported.
 #
 # Once standard input is closed or a non-matching line is read, processing ends
 # and all variables names that were set are printed to standard output.
+#
+# If the -x flag is set, then variables are also exported.
+#
+# If the -v flag is set, then the list of variables that were set as a result
+# of the function are also stored into a VARS variable as well as being
+# printed.
 setvars() {
-	if [ "$1" = "-x" ]; then
-		local export_vars=1
-		shift
-	fi
+	while [ -n "$1" ]; do
+		case "$1" in
+		-x) local export_vars=1;     shift ;;
+		-v) local store_varnames=1;  shift ;;
+		*) break ;;
+		esac
+	done
 
 	local joined_vars=$(printf \|%s $*)
 	local joined_vars=${joined_vars#|}
@@ -56,6 +65,11 @@ setvars() {
 		for v in $vars; do
 			eval ${export_vars+export --} $v=\$$v\_val
 		done
+
+		if [ -n "${store_varnames+1}" ]; then
+			VARS=${vars# }
+		fi
+
 		printf %s\\n $vars
 	fi
 

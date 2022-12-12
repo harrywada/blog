@@ -40,23 +40,7 @@ fi
 # Redirect standard input to an extra file descriptor so it can be read in
 # tandem with standard input by subshells.
 { printf %s\\n "_unix_time=$UNIX_TIME"; tac; } | {
-	# While I would _love_ to be able to do
-	#
-	# setvars -x <&3 | {
-	# 	vars=$(printf \$%s\  $(cat) | tr \  :)
-	# 	tac <&3 | cat ${2:+"$2"} - ${3:+"$3"} | envsubst "$vars"
-	# }
-	#
-	# the subshell is created immediately and therefore the values exported
-	# by setvars are not propogated to where they can be used by
-	# envsubst(1). Therefore a temporary file needs to be created on disk
-	# instead.
-
-	tmp=$(mktemp --tmpdir blog_XXXXXX)
-	trap "rm -f \"$tmp\"" EXIT
-
-	setvars -x >"$tmp" <&3 || exit 1
-	vars=$(printf \$%s\  $(cat "$tmp") | tr \  :)
-
+	setvars -x -v <&3 >/dev/null || exit 1
+	export vars=$(for v in $VARS; do printf \$%s: $v; done)
 	tac <&3 | cat ${2:+"$2"} - ${3:+"$3"} | envsubst "$vars"
 } 3<&0
