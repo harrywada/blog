@@ -5,13 +5,11 @@ PUBLIC := $(addprefix public/,$(PAGES) $(ASSETS))
 
 RESOURCES = $$(wildcard resources/$$*_*)
 
-include info.mk
-
 .PHONY: clean compose default publish
 
 default: $(PUBLIC)
 clean:
-	rm -rf public/ index.html feed.xml
+	rm -rf public/
 
 compose: draft.html
 	$(EDITOR) draft.html
@@ -21,19 +19,14 @@ publish:
 draft.html:
 	cp templates/starter.html draft.html
 
-index.html: $(POSTS) info.mk
-	export TITLE=$(TITLE) URI=$(URI) DESCRIPTION=$(DESCRIPTION); \
-	sh index.sh $(filter %.html,$^) >index.html
-feed.xml: $(POSTS) info.mk
-	export TITLE=$(TITLE) URI=$(URI) DESCRIPTION=$(DESCRIPTION); \
-	sh rss.sh $(filter %.html,$^) >feed.xml
-
 public/:
 	mkdir -p public/
+public/index.html public/feed.xml: $(POSTS) templates/$(@F) | public/
+	./template.sh templates/$(@F) >$@
 .SECONDEXPANSION:
 public/%.html: articles/%.html templates/header.html templates/footer.html \
                $(RESOURCES) | public/
-	sh assemble.sh $< templates/header.html templates/footer.html >$@
+	./template.sh $< templates/header.html templates/footer.html >$@
 public/%: %
 	@ mkdir -p $(@D)
 	cp $< $@

@@ -1,0 +1,15 @@
+<rss version="2.0">
+  <channel>
+    <title>Harry Wada's blog</title>
+    <link>$root</link>
+    <description>
+      Occasional thoughts, and maybe a bit of creative writing
+    </description>
+    <lastBuildDate>$date</lastBuildDate>
+$items
+  </channel>
+</rss>
+
+date=$(date -d@$_unix_time +"%a, %d %b %Y %H:%M:%S %Z")
+items=$(for a in $ARTICLES; do xtemplate -e root templates/item.xml "$a"; done)
+root=https://wada.blog/

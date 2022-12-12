@@ -1,0 +1,7 @@
+<li>
+	$date_pretty<br />
+	<a href="/$date.html">$title</a>: $description<br />
+	<small>$keywords</small>
+
+date=$(date -d@$_unix_time +%Y%m%d)
+date_pretty=$(date -d@$_unix_time +"%B %-d, %Y")

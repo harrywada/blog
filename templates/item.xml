@@ -1,0 +1,10 @@
+<item>
+  <title>$title</title>
+  <link>$uri</link>
+  <description>$description</description>
+  <pubDate>$date</pubDate>
+  <guid>$uri</guid>
+</item>
+
+date=$(date -d@$_unix_time +"%a, %d %b %Y %H:%M:%S %Z")
+uri="${root%/}/$(date -d@$_unix_time +%Y%m%d).html"
