@@ -19,7 +19,7 @@ publish:
 	sh publish.sh draft.html articles/
 
 draft.html:
-	cp starter.html draft.html
+	cp templates/starter.html draft.html
 
 index.html: $(POSTS) info.mk
 	export TITLE=$(TITLE) URI=$(URI) DESCRIPTION=$(DESCRIPTION); \
@@ -31,8 +31,9 @@ feed.xml: $(POSTS) info.mk
 public/:
 	mkdir -p public/
 .SECONDEXPANSION:
-public/%.html: articles/%.html $(RESOURCES) header.html footer.html | public/
-	sh assemble.sh $< header.html footer.html >$@
+public/%.html: articles/%.html templates/header.html templates/footer.html \
+               $(RESOURCES) | public/
+	sh assemble.sh $< templates/header.html templates/footer.html >$@
 public/%: %
 	@ mkdir -p $(@D)
 	cp $< $@
