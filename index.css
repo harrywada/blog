@@ -1,0 +1,43 @@
+* {
+	font-family: serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: sans-serif;
+}
+
+code {
+	font-family: monospace;
+}
+
+span[lang|="fr"], span[lang|="la"] {
+	font-style: italic;
+}
+
+body {
+	margin: 0 auto;
+	max-width: 75ch;
+	padding: 0 2em;
+}
+
+/* Index page rules. */
+
+ul#index {
+	list-style: none;
+}
+ul#index > li + li {
+	margin-top: 1em;
+}
+
+footer #source {
+	text-align: right;
+}
+
+/* Blog page rules. */
+
+p#timestamp {
+	text-align: right;
+}
+p#timestamp time::before {
+	content: "—"
+}
